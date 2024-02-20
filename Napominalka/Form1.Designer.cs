@@ -22,5 +22,6 @@ namespace Napominalka
         private TextBox textBox1;
         private Button button1;
         private DateTimePicker dateTimePicker1;
+        private FlowLayoutPanel flowLayoutPanel1;
     }
 }

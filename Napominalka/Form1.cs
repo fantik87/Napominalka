@@ -12,6 +12,7 @@ namespace Napominalka
             this.MouseDown += Form1_MouseDown; // Создаем экземпляр панели
             InitializePanel(); // Инициализируем панель
         }
+        private List<DateTime> savedDates = new List<DateTime>();
         private ContextMenuStrip contextMenuStrip1;
         private ToolStripMenuItem toolStripMenuItem1;
         private ToolStripMenuItem toolStripMenuItem2;
@@ -42,9 +43,10 @@ namespace Napominalka
             this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
-            this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -95,12 +97,12 @@ namespace Napominalka
             this.panel1.Size = new System.Drawing.Size(258, 331);
             this.panel1.TabIndex = 2;
             // 
-            // dateTimePicker1
+            // textBox1
             // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(14, 17);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(200, 23);
-            this.dateTimePicker1.TabIndex = 0;
+            this.textBox1.Location = new System.Drawing.Point(84, 134);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 23);
+            this.textBox1.TabIndex = 2;
             // 
             // button1
             // 
@@ -111,12 +113,19 @@ namespace Napominalka
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // dateTimePicker1
             // 
-            this.textBox1.Location = new System.Drawing.Point(84, 134);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 23);
-            this.textBox1.TabIndex = 2;
+            this.dateTimePicker1.Location = new System.Drawing.Point(14, 17);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(200, 23);
+            this.dateTimePicker1.TabIndex = 0;
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 9);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(200, 429);
+            this.flowLayoutPanel1.TabIndex = 3;
             // 
             // Form1
             // 
@@ -125,6 +134,7 @@ namespace Napominalka
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(45)))), ((int)(((byte)(47)))));
             this.ClientSize = new System.Drawing.Size(622, 450);
+            this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.vScrollBar1);
             this.Name = "Form1";
@@ -200,6 +210,63 @@ namespace Napominalka
             button1.Visible = !button1.Visible;
             panel1.Visible = !panel1.Visible;
             MessageBox.Show("Вы выбрали Пункт меню 1");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DateTime selectedDate = dateTimePicker1.Value;
+            AddButton(selectedDate);
+            SaveDates(); // Сохранение дат после добавления новой кнопки
+        }
+
+        private void AddButton(DateTime date)
+        {
+            Button newButton = new Button();
+            newButton.Text = dateTimePicker1.Value.ToShortDateString();
+            newButton.Width = 200;
+            newButton.Height = 30;
+            flowLayoutPanel1.Controls.Add(newButton);
+            newButton.Click += (sender, e) =>
+            {
+                MessageBox.Show($"Вы нажали кнопку с датой {newButton.Text}");
+            };
+        }
+
+        private void SaveDates()
+        {
+            using (StreamWriter writer = new StreamWriter("saved_dates.txt"))
+            {
+                foreach (DateTime date in savedDates)
+                {
+                    writer.WriteLine(date.ToString());
+                }
+            }
+        }
+
+        private void LoadSavedDates()
+        {
+            if (File.Exists("saved_dates.txt"))
+            {
+                using (StreamReader reader = new StreamReader("saved_dates.txt"))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (DateTime.TryParse(line, out DateTime date))
+                        {
+                            AddButton(date);
+                            savedDates.Add(date);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            // Сохранение выбранной даты
+            DateTime selectedDate = dateTimePicker1.Value;
+            MessageBox.Show($"Дата {selectedDate.ToShortDateString()} сохранена!");
         }
 
         private void ToolStripMenuItem2_Click(object sender, EventArgs e)
